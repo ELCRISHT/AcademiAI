@@ -1,0 +1,8 @@
+flask
+flask-cors
+numpy
+tensorflow
+scikit-learn
+joblib
+werkzeug
+flask-jwt-extended
