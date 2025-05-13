@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Dependency Assessment & Academic Performance Predictor</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/3.18.0/tf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                </svg>
+                AcademiAI
+            </div>
+            <div class="auth-section" id="authSection">
+                <button class="btn btn-outline" id="loginBtn">Log in</button>
+                <button class="btn btn-primary" id="signupBtn">Sign up</button>
+            </div>
+            <div class="user-profile" id="userProfile" style="display: none;">
+                <div class="avatar" id="userAvatar">J</div>
+                <span class="user-name" id="userName">John Doe</span>
+            </div>
+        </header>
+
+        <div class="screen active" id="welcomeScreen">
+            <div class="about-section">
+                <h1 class="about-title">AI Dependency Assessment & Academic Performance Predictor</h1>
+                <p class="about-subtitle">
+                    Discover how AI tool usage impacts your academic outcomes through our machine learning model trained on student data.
+                </p>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Get Started</h2>
+                <p>To begin analyzing how AI dependency might affect your academic performance, please create an account or log in.</p>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" id="getStartedBtn">Get Started</button>
+                    <button class="btn btn-outline" id="learnMoreBtn">Learn More</button>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3 class="card-title">How It Works</h3>
+                    <p>
+                        Our machine learning model analyzes your AI usage patterns and academic context to predict potential impacts on performance.
+                    </p>
+                    <p style="margin-top: 1rem;">
+                        The model uses data collected from thousands of students to identify correlations between AI tool dependency and academic outcomes.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Key Features</h3>
+                    <ul style="list-style-position: inside; margin-top: 0.5rem;">
+                        <li>Personalized prediction based on your specific context</li>
+                        <li>Detailed breakdown of impact factors</li>
+                        <li>Actionable recommendations to optimize AI usage</li>
+                        <li>Visual representation of prediction results</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Privacy First</h3>
+                    <p>Your data never leaves your browser. All predictions happen locally using TensorFlow.js.</p>
+                    <p style="margin-top: 1rem;">
+                        We do not store or transmit your personal information to any server.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="predictionScreen">
+            <h2 class="section-title">AI Dependency Analysis</h2>
+
+            <div class="grid">
+                <div class="card">
+                    <h3 class="card-title">Personal Information</h3>
+                    <div class="form-group">
+                        <label for="academicLevel">Academic Level</label>
+                        <select id="academicLevel">
+                            <option value="1">High School</option>
+                            <option value="2">Undergraduate</option>
+                            <option value="3">Graduate</option>
+                            <option value="4">Doctoral</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fieldOfStudy">Field of Study</label>
+                        <select id="fieldOfStudy">
+                            <option value="1">Computer Science</option>
+                            <option value="2">Engineering</option>
+                            <option value="3">Natural Sciences</option>
+                            <option value="4">Social Sciences</option>
+                            <option value="5">Humanities</option>
+                            <option value="6">Business</option>
+                            <option value="7">Medicine</option>
+                            <option value="8">Law</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="previousGPA">Previous GWA (1.00-5.00)</label>
+                        <input type="number" id="previousGPA" min="0" max="4" step="0.1" value="3.0" />
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">AI Usage Patterns</h3>
+                    <div class="form-group">
+                        <label for="aiUsageTime">Daily AI Tool Usage (hours)</label>
+                        <div class="slider-container">
+                            <div class="slider-wrapper">
+                                <input
+                                    type="range"
+                                    class="slider"
+                                    id="aiUsageTime"
+                                    min="0"
+                                    max="10"
+                                    step="0.5"
+                                    value="2"
+                                />
+                                <span class="slider-value" id="aiUsageTimeValue">2</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="aiHomeworkPercent">Assignments Using AI (%)</label>
+                        <div class="slider-container">
+                            <div class="slider-wrapper">
+                                <input
+                                    type="range"
+                                    class="slider"
+                                    id="aiHomeworkPercent"
+                                    min="0"
+                                    max="100"
+                                    step="5"
+                                    value="40"
+                                />
+                                <span class="slider-value" id="aiHomeworkPercentValue">40%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="aiDependencyLevel">Self-Perceived AI Dependency</label>
+                        <div class="slider-container">
+                            <div class="slider-wrapper">
+                                <input
+                                    type="range"
+                                    class="slider"
+                                    id="aiDependencyLevel"
+                                    min="1"
+                                    max="10"
+                                    step="1"
+                                    value="5"
+                                />
+                                <span class="slider-value" id="aiDependencyLevelValue">5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Learning Context</h3>
+                    <div class="form-group">
+                        <label for="courseDifficulty">Average Course Difficulty</label>
+                        <div class="slider-container">
+                            <div class="slider-wrapper">
+                                <input
+                                    type="range"
+                                    class="slider"
+                                    id="courseDifficulty"
+                                    min="1"
+                                    max="10"
+                                    step="1"
+                                    value="6"
+                                />
+                                <span class="slider-value" id="courseDifficultyValue">6</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="studyHoursNoAI">Study Hours Without AI (per week)</label>
+                        <div class="slider-container">
+                            <div class="slider-wrapper">
+                                <input
+                                    type="range"
+                                    class="slider"
+                                    id="studyHoursNoAI"
+                                    min="0"
+                                    max="40"
+                                    step="1"
+                                    value="15"
+                                />
+                                <span class="slider-value" id="studyHoursNoAIValue">15</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="aiUnderstanding">Understanding of AI Tool Limitations</label>
+                        <div class="slider-container">
+                            <div class="slider-wrapper">
+                                <input
+                                    type="range"
+                                    class="slider"
+                                    id="aiUnderstanding"
+                                    min="1"
+                                    max="10"
+                                    step="1"
+                                    value="7"
+                                />
+                                <span class="slider-value" id="aiUnderstandingValue">7</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin: 2rem 0; text-align: center;">
+                <button class="btn btn-primary" id="predictBtn" style="padding: 0.75rem 2rem; font-size: 1.1rem;">
+                    Generate Prediction
+                </button>
+                <div id="loadingSpinner" style="display:none; margin-top: 1rem; text-align: center;">
+                    <svg width="40" height="40" viewBox="0 0 50 50">
+                        <circle cx="25" cy="25" r="20" stroke="#007bff" stroke-width="5" fill="none" stroke-linecap="round">
+                            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
+                        </circle>
+                    </svg>
+                </div>
+            </div>
+
+            <div id="resultsSection" style="display: none;">
+                <h2 class="section-title">Prediction Results</h2>
+
+                <div class="result-section">
+                    <div class="result-value" id="predictedGPA">3.4</div>
+                    <div class="result-label">Predicted GWA</div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3 class="card-title">Impact Factors</h3>
+                        <div class="feature-importance" id="featureImportance">
+                            <!-- Feature importance items will be generated here -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">AI Dependency Analysis</h3>
+                        <div id="dependencyAnalysis">
+                            <div class="progress-bar">
+                                <div class="progress" id="dependencyProgress" style="width: 65%"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem">
+                                <span>Healthy Use</span>
+                                <span>Overreliance</span>
+                            </div>
+                            <p id="dependencyMessage">
+                                Your AI usage suggests a moderate level of dependency that may be affecting your academic growth in certain areas.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Recommendations</h3>
+                    <div id="recommendationsContainer">
+                        <!-- Recommendations will be generated here -->
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="card chart-card">
+                        <h3 class="card-title">AI Usage vs. GWA Projection</h3>
+                        <canvas id="gpaProjectionChart"></canvas>
+                    </div>
+                    <div class="card chart-card">
+                        <h3 class="card-title">Factor Analysis</h3>
+                        <canvas id="factorAnalysisChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>&copy; AcademiAI - 2025 | DevCo-BalDez</footer>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <h2 class="modal-title">Welcome to AcademiAI</h2>
+
+            <div class="tabs">
+                <div class="tab active" id="loginTab">Log In</div>
+                <div class="tab" id="signupTab">Sign Up</div>
+            </div>
+
+            <div class="tab-content active" id="loginContent">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com" />
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" />
+                </div>
+                <button class="btn btn-primary" style="width: 100%" id="loginSubmit">Log In</button>
+                <div class="auth-footer">
+                    <p>
+                        Don't have an account? <a href="#" id="switchToSignup">Sign up</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="signupContent">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" placeholder="John Doe" />
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" placeholder="your@email.com" />
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" placeholder="Create a password" />
+                </div>
+                <div class="form-group">
+                    <label for="signupConfirmPassword">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" />
+                </div>
+                <button class="btn btn-primary" style="width: 100%" id="signupSubmit">Sign Up</button>
+                <div class="auth-footer">
+                    <p>
+                        Already have an account? <a href="#" id="switchToLogin">Log in</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
